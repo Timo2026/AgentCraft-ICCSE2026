@@ -1,0 +1,9 @@
+{
+  "owner": [
+    "*"
+  ],
+  "guest": [
+    "chat",
+    "information"
+  ]
+}
