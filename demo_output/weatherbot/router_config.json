@@ -1,0 +1,17 @@
+{
+  "intent": "weatherbot",
+  "skills": [
+    "weather"
+  ],
+  "tools": [
+    "web_search"
+  ],
+  "patterns": [
+    "天气",
+    "温度",
+    "预报",
+    "下雨",
+    "晴天"
+  ],
+  "classify_model": "GLM-5.2"
+}
