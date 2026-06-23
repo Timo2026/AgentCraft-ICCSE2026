@@ -1,0 +1,22 @@
+{
+  "intent": "stockanalyst",
+  "skills": [
+    "pdf",
+    "web_search",
+    "web_fetch"
+  ],
+  "tools": [
+    "exec",
+    "read",
+    "write"
+  ],
+  "patterns": [
+    "股票",
+    "财报",
+    "分析",
+    "金融",
+    "投资",
+    "年报"
+  ],
+  "classify_model": "GLM-5.2"
+}
