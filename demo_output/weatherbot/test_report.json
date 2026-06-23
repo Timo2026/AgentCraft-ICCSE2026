@@ -1,0 +1,19 @@
+{
+  "agent": "WeatherBot",
+  "domain": "Information",
+  "stages": 6,
+  "workflow": [
+    "classify",
+    "fetch_weather",
+    "format_response"
+  ],
+  "skills": [
+    "weather"
+  ],
+  "tools": [
+    "web_search"
+  ],
+  "test_passed": false,
+  "built_at": "2026-06-23T07:35:16.263144",
+  "builder": "AgentCraft v1.0 (GLM-5.2)"
+}
