@@ -1,0 +1,9 @@
+{
+  "name": "agentcraft",
+  "version": "1.0.0",
+  "description": "AgentCraft — Agent开发教学 Copilot。教大学生从零搭建AI助手 (ICCSE 2026 Education Track)",
+  "category": "education",
+  "scripts": ["scripts/agentcraft.py"],
+  "entry": "scripts/agentcraft.py",
+  "timeout": 60
+}
