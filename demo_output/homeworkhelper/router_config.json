@@ -1,0 +1,20 @@
+{
+  "intent": "homeworkhelper",
+  "skills": [
+    "reasoning"
+  ],
+  "tools": [
+    "web_search",
+    "web_fetch",
+    "image"
+  ],
+  "patterns": [
+    "作业",
+    "解题",
+    "数学",
+    "物理",
+    "编程",
+    "微积分"
+  ],
+  "classify_model": "GLM-5.2"
+}
