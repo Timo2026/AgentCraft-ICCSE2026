@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+env/
+.venv/
+env.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.codebuddy/
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Generated output
+agentcraft_demo/
+demo_output/
+
+# Flask logs
+web/flask*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Build artifacts
+*.pptx
+!AgentCraft_ICCSE2026.pptx
