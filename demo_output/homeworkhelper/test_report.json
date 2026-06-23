@@ -1,0 +1,23 @@
+{
+  "agent": "HomeworkHelper",
+  "domain": "Education",
+  "stages": 6,
+  "workflow": [
+    "classify",
+    "decompose",
+    "step_by_step",
+    "verify",
+    "explain"
+  ],
+  "skills": [
+    "reasoning"
+  ],
+  "tools": [
+    "web_search",
+    "web_fetch",
+    "image"
+  ],
+  "test_passed": false,
+  "built_at": "2026-06-23T07:35:16.313341",
+  "builder": "AgentCraft v1.0 (GLM-5.2)"
+}
