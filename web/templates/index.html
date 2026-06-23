@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentCraft — Agent开发教学 Copilot</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        .header {
+            text-align: center;
+            padding: 40px 20px 20px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+        }
+        .input-section {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+        .input-section textarea {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #f1f5f9;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 70px;
+            outline: none;
+        }
+        .input-section textarea:focus { border-color: #60a5fa; }
+        .input-section button {
+            margin-top: 12px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .input-section button:hover { opacity: 0.9; }
+        .input-section button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .pipeline {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .step {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            opacity: 0.4;
+            transition: all 0.3s;
+        }
+        .step.active {
+            opacity: 1;
+            border-color: #60a5fa;
+            box-shadow: 0 0 20px rgba(96, 165, 250, 0.2);
+        }
+        .step.done {
+            opacity: 1;
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+        }
+        .step-icon {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        .step-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+        .step-sub {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .terminal {
+            background: #0b1220;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 20px;
+            font-family: "SF Mono", Monaco, "Cascadia Code", monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+            min-height: 300px;
+            max-height: 600px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .terminal .line { margin: 2px 0; }
+        .terminal .highlight { color: #fbbf24; }
+        .terminal .success { color: #22c55e; }
+        .terminal .error { color: #ef4444; }
+        .terminal .info { color: #60a5fa; }
+
+        .files {
+            margin-top: 24px;
+            display: none;
+        }
+        .files.visible { display: block; }
+        .files h3 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: #f1f5f9;
+        }
+        .file-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+        }
+        .file-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .file-card:hover {
+            border-color: #60a5fa;
+            transform: translateY(-2px);
+        }
+        .file-name {
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 4px;
+        }
+        .file-meta {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 100;
+        }
+        .modal.open { display: flex; }
+        .modal-content {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .modal-header h3 { color: #f1f5f9; }
+        .modal-close {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .modal pre {
+            background: #0b1220;
+            padding: 16px;
+            border-radius: 10px;
+            overflow-x: auto;
+            color: #cbd5e1;
+            font-family: "SF Mono", Monaco, monospace;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎓 AgentCraft</h1>
+        <p>Agent开发教学 Copilot — ICCSE 2026 Education Track</p>
+    </div>
+
+    <div class="container">
+        <div class="input-section">
+            <textarea id="userInput" placeholder="描述你想造的Agent，例如：我想造一个能分析股票财报的Agent"></textarea>
+            <button id="submitBtn" onclick="startBuild()">🚀 开始构建</button>
+        </div>
+
+        <div class="pipeline">
+            <div class="step" id="step-1">
+                <div class="step-icon">🔍</div>
+                <div class="step-title">Understand</div>
+                <div class="step-sub">理解你的需求</div>
+            </div>
+            <div class="step" id="step-2">
+                <div class="step-icon">📐</div>
+                <div class="step-title">Plan</div>
+                <div class="step-sub">规划Agent骨架</div>
+            </div>
+            <div class="step" id="step-3">
+                <div class="step-icon">🏗️</div>
+                <div class="step-title">Scaffold</div>
+                <div class="step-sub">生成Agent骨架</div>
+            </div>
+            <div class="step" id="step-4">
+                <div class="step-icon">🔌</div>
+                <div class="step-title">Wire</div>
+                <div class="step-sub">连接路由与工具</div>
+            </div>
+            <div class="step" id="step-5">
+                <div class="step-icon">🛡️</div>
+                <div class="step-title">Gate</div>
+                <div class="step-sub">配置安全门禁</div>
+            </div>
+            <div class="step" id="step-6">
+                <div class="step-icon">🧪</div>
+                <div class="step-title">Test</div>
+                <div class="step-sub">运行测试验证</div>
+            </div>
+        </div>
+
+        <div class="terminal" id="terminal">等待输入...</div>
+
+        <div class="files" id="files">
+            <h3>📁 生成的 Agent 文件</h3>
+            <div class="file-list" id="fileList"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">文件内容</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <pre id="modalBody"></pre>
+        </div>
+    </div>
+
+    <script>
+        let currentStage = 0;
+        const terminal = document.getElementById('terminal');
+        const filesSection = document.getElementById('files');
+        const fileList = document.getElementById('fileList');
+        const modal = document.getElementById('modal');
+
+        function setStep(n) {
+            currentStage = n;
+            for (let i = 1; i <= 6; i++) {
+                const el = document.getElementById('step-' + i);
+                el.classList.remove('active', 'done');
+                if (i < n) el.classList.add('done');
+                if (i === n) el.classList.add('active');
+            }
+        }
+
+        function appendTerminal(text, cls = '') {
+            const div = document.createElement('div');
+            div.className = 'line ' + cls;
+            div.textContent = text;
+            terminal.appendChild(div);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function showFiles(files) {
+            fileList.innerHTML = '';
+            files.forEach(f => {
+                const card = document.createElement('div');
+                card.className = 'file-card';
+                card.innerHTML = `
+                    <div class="file-name">${f.name}</div>
+                    <div class="file-meta">${f.size} bytes</div>
+                `;
+                card.onclick = () => openFile(f);
+                fileList.appendChild(card);
+            });
+            filesSection.classList.add('visible');
+        }
+
+        function openFile(f) {
+            document.getElementById('modalTitle').textContent = f.name;
+            document.getElementById('modalBody').textContent = f.content;
+            modal.classList.add('open');
+        }
+        function closeModal() { modal.classList.remove('open'); }
+        modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+
+        async function startBuild() {
+            const input = document.getElementById('userInput').value.trim();
+            if (!input) return alert('请输入你的需求');
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            terminal.innerHTML = '';
+            filesSection.classList.remove('visible');
+            setStep(1);
+            appendTerminal('🚀 启动 AgentCraft...', 'info');
+
+            try {
+                const res = await fetch('/api/build?input=' + encodeURIComponent(input));
+                const reader = res.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let files = [];
+                let exitCode = 0;
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop();
+                    for (const line of lines) {
+                        if (!line) continue;
+                        if (line.startsWith('__EXIT_CODE__:')) {
+                            exitCode = parseInt(line.split(':')[1]);
+                            continue;
+                        }
+                        if (line.includes('Stage') && line.includes('/6:')) {
+                            const m = line.match(/Stage\s+(\d)\/6/);
+                            if (m) setStep(parseInt(m[1]));
+                        }
+                        if (line.includes('📁 生成') || line.includes('📦 Agent目录')) {
+                            const nameMatch = line.match(/•\s+(\S+)\s+(\d+)\s+bytes/);
+                            if (nameMatch) files.push({ name: nameMatch[1], size: nameMatch[2], content: '' });
+                        }
+                        appendTerminal(line);
+                    }
+                }
+                if (files.length) showFiles(files);
+                if (exitCode !== 0) appendTerminal('⚠️ 执行异常，返回码: ' + exitCode, 'error');
+                else appendTerminal('✅ 构建完成！', 'success');
+
+                // 从后端读取生成的文件内容
+                try {
+                    const filesRes = await fetch('/api/files');
+                    const filesData = await filesRes.json();
+                    if (filesData.files && filesData.files.length) {
+                        showFiles(filesData.files);
+                    }
+                } catch (e) {
+                    console.error('加载文件列表失败', e);
+                }
+            } catch (e) {
+                appendTerminal('请求失败: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
